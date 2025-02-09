@@ -12,5 +12,5 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(main src/main.cpp "src/Player.cpp" "src/Headers/Player.h" "src/Headers/Gun.h" "src/Gun.cpp" "src/TextureManager.cpp")
+add_executable(main src/main.cpp "src/Player.cpp" "src/Headers/Player.h" "src/Headers/Gun.h" "src/Gun.cpp" "src/TextureManager.cpp" "src/TileMap.cpp" "src/Headers/TileMap.h")
 target_link_libraries(main PRIVATE SFML::Graphics)

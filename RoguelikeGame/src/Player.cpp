@@ -17,5 +17,9 @@ Player::Player() : body(sf::Vector2f(50.f, 50.f)), health(100) {
     const sf::Vector2f Player::getPosition() {
         return sf::Vector2f(body.getPosition().x, body.getPosition().y);
     }
+    void Player::setPosition(sf::Vector2f pos) {
+        body.setPosition(pos);
+    }
+    
 
 

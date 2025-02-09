@@ -3,12 +3,14 @@
 #include "Headers/Gun.h"
 #include <iostream>
 #include <fstream>
+#include "Headers/TileMap.h";
 
 void rangedAttack(Gun& gun, sf::Vector2f playerPos, sf::Vector2f targetPos, std::vector<std::pair<sf::CircleShape, sf::Vector2f>>& bullets);
 
 
 int main()
 {
+
     auto window = sf::RenderWindow(sf::VideoMode({1920u, 1080u}), "Roguelike");
     window.setFramerateLimit(144);
     sf::Clock clock;
@@ -19,6 +21,29 @@ int main()
     int speed = 300;
     sf::View player_view;
     player_view.setSize(sf::Vector2(1000.f, 1000.f));
+    player.setPosition(sf::Vector2f(window.getSize().x / 2, window.getSize().y / 2));
+
+    sf::Vector2u tileSize(128, 128);
+    const unsigned int width = 10;
+    const unsigned int height = 10;
+    TileMap tileMap;
+  
+
+    int tiles[width * height] = {
+        0, 1, 2, 0, 1, 2, 0, 1, 2, 0,
+        1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
+        2, 0, 1, 2, 0, 1, 2, 0, 1, 2,
+        0, 1, 2, 0, 1, 2, 0, 1, 2, 0,
+        1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
+        2, 0, 1, 2, 0, 1, 2, 0, 1, 2,
+        0, 1, 2, 0, 1, 2, 0, 1, 2, 0,
+        1, 2, 0, 1, 2, 0, 1, 2, 0, 1,
+        2, 0, 1, 2, 0, 1, 2, 0, 1, 2,
+        0, 1, 2, 0, 1, 2, 0, 1, 2, 0
+    };
+
+    if (!tileMap.load(tileSize, tiles, width, height))
+        return -1; // Exit if loading fails
 
     clock.start();
     while (window.isOpen())
@@ -73,14 +98,17 @@ int main()
              }
         window.clear();
         window.setView(player_view);
-
+        window.draw(tileMap);
         player.draw(window);
+
+    
 
         for (const auto& bullet : bullets)
         {
             window.draw(bullet.first);
         }
 
+        
         window.display();
     }
    
@@ -125,5 +153,7 @@ void loadTileMap(const std::string& filename, std::vector<std::string>& tilemap)
     }
 
 }
+
+
 
 
