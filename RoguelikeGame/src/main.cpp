@@ -1,17 +1,15 @@
 #include <SFML/Graphics.hpp>
 #include "Headers/Player.h"
-#include "Headers/Gun.h"
 #include <iostream>
 #include <fstream>
 #include "Headers/TileMap.h";
 #include "Headers/BulletManager.h";
 
-void rangedAttack(Gun& gun, sf::Vector2f playerPos, sf::Vector2f targetPos, std::vector<std::pair<sf::CircleShape, sf::Vector2f>>& bullets);
+
 bool checkBounds(Player& player);
 bool checkNextBounds(Player& player, float dx, float dy);
 void handleEvents(sf::RenderWindow& window, Player& player, BulletManager& bulletManager);
 void handleMovement(Player& player, int speed, float dt);
-void handlePlayerGun(std::vector<std::pair<sf::CircleShape, sf::Vector2f>>& bullets, float dt);
 
 int MAX_HEIGHT = 1080;
 int MAX_WIDTH = 1920;
@@ -23,7 +21,6 @@ int main()
     sf::Clock clock;
     Player player;
     BulletManager bulletManager;
-    Gun gun;
     sf::RectangleShape background(sf::Vector2f(MAX_WIDTH, MAX_HEIGHT));
     background.setFillColor(sf::Color::White);
     sf::Vector2 movement(0, 0);
@@ -65,13 +62,13 @@ int main()
 
 		player_view.setCenter(sf::Vector2(player.getPosition()));
         bulletManager.update(dt);
-        /*handlePlayerGun(bullets, dt);*/
+ 
 
 		
 		window.clear();
 		window.setView(player_view);
 		window.draw(background);
-		/*window.draw(tileMap);*/
+	
 		player.draw(window);
         bulletManager.draw(window);
 
@@ -86,24 +83,6 @@ int main()
 }
 
 
-void handlePlayerGun(std::vector<std::pair<sf::CircleShape, sf::Vector2f>>& bullets, float dt) {
-    for (auto it = bullets.begin(); it != bullets.end();)
-    {
-        // Move the bullet
-        it->first.move(it->second * dt);
-
-        // Remove bullets that go off-screen
-        sf::Vector2f pos = it->first.getPosition();
-        if (pos.x < 0 || pos.x > MAX_WIDTH || pos.y < 0 || pos.y > MAX_HEIGHT)
-        {
-            it = bullets.erase(it); // Remove bullet and get next iterator
-        }
-        else
-        {
-            ++it;
-        }
-    }
-}
 
 void handleEvents(sf::RenderWindow& window, Player& player, BulletManager& bulletManager) {
     while (const std::optional event = window.pollEvent()) {
@@ -118,7 +97,7 @@ void handleEvents(sf::RenderWindow& window, Player& player, BulletManager& bulle
             bulletManager.spawnBullet(playerPos, mousePos);
             std::cout << "Mouse location: " << "x: " << mousePos.x << " y: " << mousePos.y << "\n";
             std::cout << "Player position: " << "x: " << player.getPosition().x << " y: " << player.getPosition().y << "\n";
-            /*rangedAttack(gun, playerPos, mousePos, bullets);*/
+     
         }
     }
 }
@@ -149,33 +128,6 @@ void handleMovement(Player& player, int speed, float dt) {
     }
 }
 
-
-
-void rangedAttack(Gun& gun, sf::Vector2f playerPos, sf::Vector2f targetPos, std::vector<std::pair<sf::CircleShape, sf::Vector2f>>& bullets) {
-    // Calculate the direction vector
-    sf::Vector2f d_vec(targetPos.x - playerPos.x, targetPos.y - playerPos.y); 
-    float magnitude = std::sqrt(d_vec.x * d_vec.x + d_vec.y * d_vec.y);
-
-    // Normalize the direction vector
-    if (magnitude != 0) {
-        d_vec.x /= magnitude;
-        d_vec.y /= magnitude;
-    }
-
-    // Create the bullet
-    sf::CircleShape bullet = gun.bullet;
-    bullet.setPosition(playerPos); // Set initial position to the player
-
-    // Calculate the velocity
-    sf::Vector2f velocity = d_vec * gun.getSpeed();
-    std::cout << "Bullet velocity: " << velocity.x << velocity.y << "\n";
-
-    // Add the bullet and its velocity to the bullets container
-    bullets.emplace_back(bullet, velocity);
-
-    std::cout << "New bullet added at position: " << playerPos.x << ", " << playerPos.y << "\n";
-    std::cout << "Velocity: " << velocity.x << ", " << velocity.y << "\n";
-}
 
 void loadTileMap(const std::string& filename, std::vector<std::string>& tilemap) {     
     //moves .txt file data to a vector.
