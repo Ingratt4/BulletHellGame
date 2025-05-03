@@ -1,19 +1,18 @@
-#define PLAYER_H
-
+#define ENEMY_H
 #include <SFML/Graphics.hpp>
+#include "Bomb.h";
 
-class Player {
+class Enemy {
 public:
-	Player();
+	Enemy();
 	void move(float dx, float dy);
 	void draw(sf::RenderWindow& window);
 	const sf::Vector2f getPosition();
 	void setPosition(sf::Vector2f pos);
-	void updateHealth();
-	void updateHealthbarLocation();
+	void checkAttackArea();
 private:
 	sf::RectangleShape body;
-	sf::RectangleShape redHealth;
-	sf::RectangleShape greenHealth;
+	sf::CircleShape attackArea;
+	Bomb bomb;
 	int health;
 };
