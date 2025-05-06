@@ -13,9 +13,12 @@ public:
 	void checkAttackArea();
 	void attack(sf::Vector2f playerPos, float dt);
 	bool isPlayerInAttackRange(sf::Vector2f playerPos);
+	float getAttackCooldown();
+	void setAttackCooldown(float cooldown);
 private:
 	sf::RectangleShape body;
 	AttackRange attackRange;
 	int health;
 	float speed;
+	float attackCooldown;
 };

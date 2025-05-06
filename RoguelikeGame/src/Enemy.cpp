@@ -66,3 +66,13 @@ bool Enemy::isPlayerInAttackRange(sf::Vector2f playerPos)
     return false;
 }
 
+float Enemy::getAttackCooldown()
+{
+    return attackCooldown;
+}
+
+void Enemy::setAttackCooldown(float cooldown)
+{
+    attackCooldown = cooldown;
+}
+

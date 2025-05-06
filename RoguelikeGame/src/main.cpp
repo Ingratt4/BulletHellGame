@@ -10,7 +10,7 @@ bool checkBounds(Player& player);
 bool checkNextBounds(Player& player, float dx, float dy);
 void handleEvents(sf::RenderWindow& window, Player& player, BulletManager& bulletManager);
 void handleMovement(Player& player, int speed, float dt);
-void enemyAttackPlayer(Enemy& enemy, sf::Vector2f& playerPos, BulletManager& manager);
+void enemyAttackPlayer(Enemy& enemy, sf::Vector2f& playerPos, BulletManager& manager, float dt);
 
 int MAX_HEIGHT = 1080;
 int MAX_WIDTH = 1920;
@@ -69,7 +69,7 @@ int main()
 		player_view.setCenter(sf::Vector2(player.getPosition()));
         playerBulletManager.update(dt);
         enemyBulletManager.update(dt);
-        enemyAttackPlayer(mob, playerPos, enemyBulletManager);
+        enemyAttackPlayer(mob, playerPos, enemyBulletManager, dt);
         mob.moveTowardsPlayer(playerPos, dt);
  
 
@@ -171,10 +171,17 @@ bool checkNextBounds(Player& player, float dx, float dy) {
 }
 
 
-void enemyAttackPlayer(Enemy& enemy, sf::Vector2f& playerPos, BulletManager& manager) {
+void enemyAttackPlayer(Enemy& enemy, sf::Vector2f& playerPos, BulletManager& manager, float dt) {
     if (enemy.isPlayerInAttackRange(playerPos)) {
-        manager.spawnBullet(enemy.getPosition(), playerPos, BulletOwner::Enemy);
+        if (enemy.getAttackCooldown() <= 0.f) {
+            manager.spawnBullet(enemy.getPosition(), playerPos, BulletOwner::Enemy);
+            enemy.setAttackCooldown(1.0f); // cooldown duration in seconds
+        }
     }
+
+    // Always decrement the cooldown (but never below 0)
+    float newCooldown = std::max(0.f, enemy.getAttackCooldown() - dt);
+    enemy.setAttackCooldown(newCooldown);
 }
 
 
