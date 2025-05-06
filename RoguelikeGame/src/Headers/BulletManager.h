@@ -5,7 +5,7 @@ class BulletManager {
 
 public:
 
-	void spawnBullet(const sf::Vector2f& position, const sf::Vector2f& target);
+	void spawnBullet(const sf::Vector2f& position, const sf::Vector2f& target, BulletOwner owner);
 	void update(float dt);
 	void draw(sf::RenderWindow& window) const;
 

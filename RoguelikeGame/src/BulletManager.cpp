@@ -1,21 +1,22 @@
 #include "headers\BulletManager.h"
 
-Bullet::Bullet(const sf::Vector2f& pos, const sf::Vector2f& vel) :
-	velocity(vel) {
+Bullet::Bullet(const sf::Vector2f& pos, const sf::Vector2f& vel, BulletOwner owner) :
+	velocity(vel), owner(owner) {
 	shape.setRadius(5.f);
-	shape.setFillColor(sf::Color::Red);
+	shape.setFillColor(owner == BulletOwner::Player ? sf::Color::Green : sf::Color::Red);
 	shape.setPosition(pos);
+
 }
 	
 
 
-void BulletManager::spawnBullet(const sf::Vector2f& position, const sf::Vector2f& target) {
+void BulletManager::spawnBullet(const sf::Vector2f& position, const sf::Vector2f& target, BulletOwner owner) {
 	sf::Vector2f direction = target - position;
 	float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
 	if (length != 0) direction /= length;
 
 	sf::Vector2f velocity = direction * bulletSpeed;
-	bullets.emplace_back(position, velocity);
+	bullets.emplace_back(position, velocity, owner);
 }
 
 void BulletManager::update(float dt) {

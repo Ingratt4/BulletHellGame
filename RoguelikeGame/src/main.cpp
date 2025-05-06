@@ -4,12 +4,13 @@
 #include <fstream>
 #include "Headers/TileMap.h";
 #include "Headers/BulletManager.h";
-
+#include "Headers/Enemy.h";
 
 bool checkBounds(Player& player);
 bool checkNextBounds(Player& player, float dx, float dy);
 void handleEvents(sf::RenderWindow& window, Player& player, BulletManager& bulletManager);
 void handleMovement(Player& player, int speed, float dt);
+void enemyAttackPlayer(Enemy& enemy, sf::Vector2f& playerPos, BulletManager& manager);
 
 int MAX_HEIGHT = 1080;
 int MAX_WIDTH = 1920;
@@ -20,7 +21,10 @@ int main()
     window.setFramerateLimit(144);
     sf::Clock clock;
     Player player;
-    BulletManager bulletManager;
+    Enemy mob;
+    mob.setPosition(sf::Vector2f(100.f, 100.f));
+    BulletManager playerBulletManager;
+    BulletManager enemyBulletManager;
     sf::RectangleShape background(sf::Vector2f(MAX_WIDTH, MAX_HEIGHT));
     background.setFillColor(sf::Color::White);
     sf::Vector2 movement(0, 0);
@@ -54,14 +58,19 @@ int main()
     clock.start();
 	while (window.isOpen())
 	{
+        sf::Vector2f playerPos = player.getPosition();
 		float dt = clock.restart().asSeconds();
 
-		handleEvents(window, player, bulletManager);
+		handleEvents(window, player, playerBulletManager);
 
 		handleMovement(player, speed, dt);
+ 
 
 		player_view.setCenter(sf::Vector2(player.getPosition()));
-        bulletManager.update(dt);
+        playerBulletManager.update(dt);
+        enemyBulletManager.update(dt);
+        enemyAttackPlayer(mob, playerPos, enemyBulletManager);
+        mob.moveTowardsPlayer(playerPos, dt);
  
 
 		
@@ -69,8 +78,10 @@ int main()
 		window.setView(player_view);
 		window.draw(background);
 	
-		player.draw(window);
-        bulletManager.draw(window);
+        player.draw(window);
+        mob.draw(window);
+        enemyBulletManager.draw(window);
+        playerBulletManager.draw(window);
 
 
 
@@ -94,7 +105,7 @@ void handleEvents(sf::RenderWindow& window, Player& player, BulletManager& bulle
         if (event->is<sf::Event::MouseButtonPressed>()) {
             sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
             sf::Vector2f playerPos = player.getPosition();
-            bulletManager.spawnBullet(playerPos, mousePos);
+            bulletManager.spawnBullet(playerPos, mousePos, BulletOwner::Player);
             std::cout << "Mouse location: " << "x: " << mousePos.x << " y: " << mousePos.y << "\n";
             std::cout << "Player position: " << "x: " << player.getPosition().x << " y: " << player.getPosition().y << "\n";
      
@@ -157,6 +168,13 @@ bool checkNextBounds(Player& player, float dx, float dy) {
     }
     return false;
     
+}
+
+
+void enemyAttackPlayer(Enemy& enemy, sf::Vector2f& playerPos, BulletManager& manager) {
+    if (enemy.isPlayerInAttackRange(playerPos)) {
+        manager.spawnBullet(enemy.getPosition(), playerPos, BulletOwner::Enemy);
+    }
 }
 
 
