@@ -5,12 +5,13 @@
 #include "Headers/TileMap.h";
 #include "Headers/BulletManager.h";
 #include "Headers/Enemy.h";
+#include "Headers/EnemyManager.h";
 
 bool checkBounds(Player& player);
 bool checkNextBounds(Player& player, float dx, float dy);
 void handleEvents(sf::RenderWindow& window, Player& player, BulletManager& bulletManager);
 void handleMovement(Player& player, int speed, float dt);
-void enemyAttackPlayer(Enemy& enemy, sf::Vector2f& playerPos, BulletManager& manager, float dt);
+
 
 int MAX_HEIGHT = 1080;
 int MAX_WIDTH = 1920;
@@ -21,8 +22,9 @@ int main()
     window.setFramerateLimit(144);
     sf::Clock clock;
     Player player;
-    Enemy mob;
-    mob.setPosition(sf::Vector2f(100.f, 100.f));
+    std::vector<Damageable*> e_targets;
+
+    EnemyManager enemyManager;
     BulletManager playerBulletManager;
     BulletManager enemyBulletManager;
     sf::RectangleShape background(sf::Vector2f(MAX_WIDTH, MAX_HEIGHT));
@@ -56,40 +58,43 @@ int main()
         return -1; // Exit if loading fails
 
     clock.start();
-	while (window.isOpen())
-	{
+    enemyManager.spawnEnemy(sf::Vector2f(10, 10));
+    
+    enemyManager.spawnEnemy(sf::Vector2f(1000, -50));
+    std::vector<Damageable*> p_targets = { &player };
+
+
+    while (window.isOpen())
+    {
+        float dt = clock.restart().asSeconds();
         sf::Vector2f playerPos = player.getPosition();
-		float dt = clock.restart().asSeconds();
 
-		handleEvents(window, player, playerBulletManager);
+        // --- Handle input & movement ---
+        handleEvents(window, player, playerBulletManager);
+        handleMovement(player, speed, dt);
+        player_view.setCenter(playerPos);
 
-		handleMovement(player, speed, dt);
- 
+        // --- Update game objects ---
+        for (Enemy& e : enemyManager.getEnemies()) {
+            e_targets.push_back(&e);
+        }
+        playerBulletManager.update(dt ,e_targets);
+        enemyBulletManager.update(dt, p_targets);
+        enemyManager.update(playerPos, enemyBulletManager, dt);
 
-		player_view.setCenter(sf::Vector2(player.getPosition()));
-        playerBulletManager.update(dt);
-        enemyBulletManager.update(dt);
-        enemyAttackPlayer(mob, playerPos, enemyBulletManager, dt);
-        mob.moveTowardsPlayer(playerPos, dt);
- 
+        // --- Render ---
+        window.clear();
+        window.setView(player_view);
 
-		
-		window.clear();
-		window.setView(player_view);
-		window.draw(background);
-	
+        window.draw(background);
+        enemyManager.draw(window);
         player.draw(window);
-        mob.draw(window);
-        enemyBulletManager.draw(window);
         playerBulletManager.draw(window);
+        enemyBulletManager.draw(window);
 
+        window.display();
+    }
 
-
-		
-
-
-		window.display();
-	}
    
 }
 
@@ -105,7 +110,7 @@ void handleEvents(sf::RenderWindow& window, Player& player, BulletManager& bulle
         if (event->is<sf::Event::MouseButtonPressed>()) {
             sf::Vector2f mousePos = window.mapPixelToCoords(sf::Mouse::getPosition(window));
             sf::Vector2f playerPos = player.getPosition();
-            bulletManager.spawnBullet(playerPos, mousePos, BulletOwner::Player);
+            bulletManager.spawnBullet(playerPos, mousePos, BulletOwner::Player, 5 );
             std::cout << "Mouse location: " << "x: " << mousePos.x << " y: " << mousePos.y << "\n";
             std::cout << "Player position: " << "x: " << player.getPosition().x << " y: " << player.getPosition().y << "\n";
      
@@ -169,21 +174,6 @@ bool checkNextBounds(Player& player, float dx, float dy) {
     return false;
     
 }
-
-
-void enemyAttackPlayer(Enemy& enemy, sf::Vector2f& playerPos, BulletManager& manager, float dt) {
-    if (enemy.isPlayerInAttackRange(playerPos)) {
-        if (enemy.getAttackCooldown() <= 0.f) {
-            manager.spawnBullet(enemy.getPosition(), playerPos, BulletOwner::Enemy);
-            enemy.setAttackCooldown(1.0f); // cooldown duration in seconds
-        }
-    }
-
-    // Always decrement the cooldown (but never below 0)
-    float newCooldown = std::max(0.f, enemy.getAttackCooldown() - dt);
-    enemy.setAttackCooldown(newCooldown);
-}
-
 
 
 

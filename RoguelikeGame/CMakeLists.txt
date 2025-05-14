@@ -12,5 +12,5 @@ FetchContent_Declare(SFML
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
 
-add_executable(main src/main.cpp "src/Player.cpp" "src/Headers/Player.h" "src/TextureManager.cpp" "src/TileMap.cpp" "src/Headers/TileMap.h" "src/Headers/Enemy.h" "src/Enemy.cpp" "src/Headers/BulletManager.h" "src/Headers/Bullet.h" "src/BulletManager.cpp" "src/Headers/EnemyManager.h" "src/EnemyManager.cpp")
+add_executable(main src/main.cpp "src/Player.cpp" "src/Headers/Player.h" "src/TextureManager.cpp" "src/TileMap.cpp" "src/Headers/TileMap.h" "src/Headers/Enemy.h" "src/Enemy.cpp" "src/Headers/BulletManager.h" "src/Headers/Bullet.h" "src/BulletManager.cpp" "src/Headers/EnemyManager.h" "src/EnemyManager.cpp" "src/Headers/HealthManager.h")
 target_link_libraries(main PRIVATE SFML::Graphics)

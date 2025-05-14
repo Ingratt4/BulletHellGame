@@ -1,0 +1,5 @@
+class HealthManager {
+public:
+private:
+
+};
