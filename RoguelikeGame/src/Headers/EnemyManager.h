@@ -4,13 +4,13 @@
 
 class EnemyManager {
 public:
-	void deleteEnemy();
+	void removeDeadEnemies();
 	void spawnEnemy(const sf::Vector2f& position);
 	void EnemyManager::update(const sf::Vector2f& playerPos, BulletManager& enemyBulletManager, float dt);
 	void draw(sf::RenderWindow& window) const;
-	std::vector<Enemy>& getEnemies();
+	std::vector<std::unique_ptr<Enemy>>& EnemyManager::getEnemies();
 private:
-	std::vector<Enemy> enemies;
+	std::vector<std::unique_ptr<Enemy>> enemies;
 	int enemyLimit = 1;
 
 

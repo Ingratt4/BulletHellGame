@@ -24,12 +24,22 @@ public:
 	int getHealth() const;
 	void takeDamage(float damage) override;
 	sf::FloatRect getBounds() const override;
+	bool isDead();
+	void updateHealthbarLocation();
+
+
+	bool isEnemy() const override;
+	bool isPlayer() const override;
+
 private:
 	sf::RectangleShape body;
 	AttackRange attackRange;
+	sf::RectangleShape redHealth;
+	sf::RectangleShape greenHealth;
 	int health;
 	float speed;
 	float attackCooldown;
+	bool dead = false;
 };
 
 #endif // ATTACK_RANGE_H
